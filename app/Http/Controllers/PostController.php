@@ -19,10 +19,6 @@ class PostController extends Controller
             'end_date' => 'nullable|date|after_or_equal:start_date',
         ]);
 
-        Project::with(['tasks' => function ( $query) {
-            $query->with('users');
-        }])->get();
-
         $posts = Post::with('user', 'comments')
             ->when($request->input('title'), function (Builder $query) use ($request) {
                 return $query->where('title', 'like', '%' . $request->input('title') . '%');
