@@ -1,5 +1,8 @@
 <?php
 
+use Illuminate\Support\ServiceProvider;
+use Illuminate\Translation\TranslationServiceProvider;
+
 return [
 
     /*
@@ -123,4 +126,7 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    'providers' => ServiceProvider::defaultProviders()->except([
+        TranslationServiceProvider::class,
+    ])->toArray()
 ];
