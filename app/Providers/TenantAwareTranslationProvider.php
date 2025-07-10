@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Services\TenantAwareTranslatorService;
+use App\Services\TranslationKeyModifierService;
 use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Translation\FileLoader;
@@ -22,6 +23,7 @@ class TenantAwareTranslationProvider extends ServiceProvider
 
             $trans = new TenantAwareTranslatorService($loader, $locale);
             $trans->setFallback($app->getFallbackLocale());
+            $trans->setKeyModifierService($app->make(TranslationKeyModifierService::class));
 
             return $trans;
         });
