@@ -2,39 +2,30 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Post;
-use App\Models\User;
-use Illuminate\Database\Query\Builder;
-use Illuminate\Http\JsonResponse;
+use App\Services\PostService;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 
 class PostController extends Controller
 {
-    public function index(Request $request): JsonResponse
+    protected PostService $postService;
+
+    public function __construct(PostService $postService)
     {
-        $request->validate([
-            'title' => 'nullable|string|max:255',
-            'user' => 'nullable|string|max:255',
-            'start_date' => 'nullable|date',
-            'end_date' => 'nullable|date|after_or_equal:start_date',
+        $this->postService = $postService;
+    }
+
+    public function index(Request $request): View
+    {
+        return view('posts.index', [
+            "posts" => $this->postService->index($request),
         ]);
+    }
 
-        $posts = Post::with('user', 'comments')
-            ->when($request->input('title'), function (Builder $query) use ($request) {
-                return $query->where('title', 'like', '%' . $request->input('title') . '%');
-            })
-            ->when($request->input('search'), function (Builder $query) use ($request) {
-                return $query->whereHas('user', function (Builder $q) use ($request) {
-                    $q->where('name', 'like', '%' . $request->input('search') . '%');
-                });
-            })->when($request->input('start_date'), function (Builder $query) use ($request) {
-                return $query->whereDate('created_at', '>=', $request->input('start_date'));
-            })
-            ->when($request->input('end_date'), function (Builder $query) use ($request) {
-                return $query->whereDate('created_at', '<=', $request->input('end_date'));
-            })
-            ->paginate();
-
-        return response()->json(['posts' => $posts]);
+    public function show(int $id): View
+    {
+        return view('posts.show', [
+            'post' => $this->postService->show($id),
+        ]);
     }
 }
