@@ -1,5 +1,5 @@
 <?php
 
 return [
-    'label_title' => 'Heading',
+    'label_title' => 'Caption',
 ];
